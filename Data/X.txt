@@ -1,0 +1,16 @@
+#0
+The system has a single unique solution!
+X(1x3)
+-0.2, 1.5, 1.1, 
+#0
+The system has a single unique solution!
+X(1x3)
+-0.2, 1.5, 1.1, 
+#0
+The system has no solution!
+X(1x3)
+2.00208e+30, 3.08061e-41, -1.1, 
+#0
+The system has infinitely many solutions! Here is one of them.
+X(1x3)
+2, -4, 0, 
