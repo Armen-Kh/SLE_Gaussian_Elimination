@@ -1,0 +1,50 @@
+1. Creates Dynamic Library(Libs/Libdinsle.So) Which Provides File_Reader, File_Writer, Matrix And Result Classes, Also Read_Sle, Read_Result, Write_Sle_Solution Functions
+ 
+2. Runs Gaussian_Elimination From Main.Cpp (Sources)
+
+3. Testing Phase (Test)
+
+
+folder/Din_Lib:
+	file_reader.cpp:
+		class File_Reader  //read info from file
+
+	file_writer.cpp:
+		class File_Writer  //write information to file
+
+	sle_matrix.cpp:
+		class Matrix  //Matrix class is used to describe the system's coefficients (A) 
+			
+		class Result   //The class Result describes the solution of a system of linear equations.
+
+	utility.cpp:
+		//The function reads the coefficients(A) and b vector as matrices. 
+		bool Read_SLE(File_Reader&, Matrix&, Matrix&);
+	
+		
+		//The function simply reads the solution data and assigns it to the corresponding class Result object methods.
+		bool Read_Result(File_Reader&, Result&);
+	
+		bool Write_SLE_Solution(File_Writer&, const Matrix&, std::string&);
+
+folder/Sources:
+	main.cpp:
+		Reading system of linera equation as a matrix, and after Gaussian_Elimination implementation writes results to the file.
+
+	gaussian_elimination.cpp:
+		Create_Augmented_Matrix(Matrix&, Matrix&, Matrix&)
+
+		Variable_Elemination(Matrix&);  //changing to upper triangular matrix besides last column 
+
+		Backward_Substitution(Matrix& AM, Matrix& X_out, std::string& conclusion_out, float epsilon)
+
+		//epsilon is necessary to take into account the behavioral deviations of float number..
+		Gaussian_Elimination (Matrix& A, Matrix& B, Matrix& X_out, std::string& conclusion_out, float epsilon)
+
+folder/Test:
+	test_comparator.cpp: //This code compares the output file with the gold output using epsilon precision
+	
+	//The test results are presented in "test_comparator_result.txt" file (Data folder)
+
+	
+	test_variables_lacement.cpp

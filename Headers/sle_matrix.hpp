@@ -1,9 +1,11 @@
-#ifndef MATRIX_HPP
-#define MATRIX_HPP
+#ifndef SLE_MATRIX_HPP
+#define SLE_MATRIX_HPP
 
 #include <cstddef>    //size_t
+#include <string>
 
-class Matrix {
+//Matrix class is used to describe the system's coefficients (A)
+class  Matrix {
 
 public:
 	Matrix();
@@ -41,6 +43,23 @@ private:
 	std::size_t size;
 	std::size_t number;
 	float ** data;
+};
+
+//The class Result describes the solution of a system of linear equations.
+class Result : public Matrix
+{
+public:
+        Result();
+        Result(std::string s, std::size_t r, std::size_t c);
+	
+	Result(const Result&);
+	Result& operator=(const Result&);
+
+        void set_state(std::string s);
+        std::string get_state() const;
+
+private:
+        std::string state;
 };
 
 #endif

@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 
+//write information to file
 class File_Writer {
 
 public:

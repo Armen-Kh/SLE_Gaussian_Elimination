@@ -1,4 +1,4 @@
-#include "matrix.hpp"
+#include "sle_matrix.hpp"
 
 #include <iostream>
 #include <algorithm>
@@ -10,22 +10,25 @@
 #include <string>
 
 void Create_Augmented_Matrix(Matrix&, Matrix&, Matrix&);
-void Variable_Elemination(Matrix&);          //changing to upper triangular matrix besides last column 
-void Backward_Substitution(Matrix&, Matrix&, std::string&);
+void Variable_Elemination(Matrix&);    //changing to upper triangular matrix besides last column 
+void Backward_Substitution(Matrix&, Matrix&, std::string&, float);
 
 
-void Gaussian_Elimination (Matrix& A, Matrix& B, Matrix& X_out, std::string& conclusion_out)
+void Gaussian_Elimination (Matrix& A, Matrix& B, Matrix& X_out, std::string& conclusion_out, float epsilon)  //epsilon is necessary to take into account the behavioral deviations of float number..
 {
 	X_out = Matrix(1, A.get_columns());
+	X_out.set_number(A.get_number());
+	
+	assert(A.get_rows() == B.get_size() && A.get_columns() == X_out.get_size() && "size mismartch!");
+	
 	std::size_t height = A.get_rows();
 	std::size_t width = A.get_columns() + 1;
 
 	Matrix AM(height, width);
-	assert(A.get_rows() == B.get_size() && A.get_columns() == X_out.get_size() &&  "size mismartch!");
 
 	Create_Augmented_Matrix(A, B, AM);
 	Variable_Elemination(AM);
-	Backward_Substitution(AM, X_out, conclusion_out);	
+	Backward_Substitution(AM, X_out, conclusion_out, epsilon);	
 }
 
 
@@ -56,7 +59,6 @@ void Variable_Elemination(Matrix& AM)
 		while (0 == AM(j, j) && w < height) {
 			if(0 != AM(w, j)) {
 				AM.Swap_Rows(j, w);
-				std::cout << "Swapping ... \n";			
 			}
 			else {
 				++w;
@@ -78,20 +80,19 @@ void Variable_Elemination(Matrix& AM)
 }
 
 
-void Backward_Substitution(Matrix& AM, Matrix& X_out, std::string& conclusion_out)
+void Backward_Substitution(Matrix& AM, Matrix& X_out, std::string& conclusion_out, float epsilon)  //epsilon is necessary to take into account the behavioral deviations of float number..
 {
 	int count = 0;
-	conclusion_out = "The system has a single unique solution!";
+	conclusion_out = "SS_The system has a single unique solution!";
 	std::size_t height = AM.get_rows();
 	std::size_t width = AM.get_columns();
 
 	assert(X_out.get_columns() == width - 1 && "Size mismatch!\n");
 
       	// case: height >= width
-	float epsilon = 0.00001;
 	for (int64_t i = height - 1; i >= width - 1; --i) {
                 if(std::abs(0 - AM(i, width - 1)) > epsilon) {        //epsilon accuracy
-                        conclusion_out = "The system has no solution!";
+                        conclusion_out = "NS_The system has no solution!";
                         return;
                 }
         }
@@ -102,7 +103,7 @@ void Backward_Substitution(Matrix& AM, Matrix& X_out, std::string& conclusion_ou
 		for(int64_t i = height - 1; i >= 0; --i) {
 			AM(i, j) = 0;
 		}
-                conclusion_out = "The system has infinitely many solutions! Here is one of them.";
+                conclusion_out = "IS_The system has infinitely many solutions! Here is one of them.";
 	}
 
 	std::size_t m = std::min(height - 1, width - 2);
@@ -114,7 +115,7 @@ void Backward_Substitution(Matrix& AM, Matrix& X_out, std::string& conclusion_ou
 
                 if(0 == AM(i, i)) {
                         if(std::abs(s - AM(i, width - 1)) > epsilon) {
-                                conclusion_out = "The system has no solution!";
+                                conclusion_out = "NS_The system has no solution!";
                                 return;
                         }
                         else {
@@ -122,7 +123,7 @@ void Backward_Substitution(Matrix& AM, Matrix& X_out, std::string& conclusion_ou
                                 for(int64_t k = i - 1; k >= 0; --k) {
                                         AM(k, i) = 0;
                                 }
-                		conclusion_out = "The system has infinitely many solutions! Here is one of them.";
+                		conclusion_out = "IS_The system has infinitely many solutions! Here is one of them.";
                         }
                 }
                 else { 

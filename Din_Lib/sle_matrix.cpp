@@ -1,4 +1,4 @@
-#include "matrix.hpp"
+#include "sle_matrix.hpp"
 
 #include <iostream>
 #include <cstddef>
@@ -35,7 +35,6 @@ Matrix::Matrix(const Matrix& M)
 			data[i][j] = M.data[i][j];
 		}	
 	}
-
 }
 
 Matrix& Matrix::operator=(const Matrix& M)
@@ -111,3 +110,31 @@ void Matrix::set_rows(std::size_t r) { rows = r; }
 void Matrix::set_columns(std::size_t c) { columns = c; }
 void Matrix::set_size(std::size_t s) { size = s; }
 void Matrix::set_number(std::size_t n) { number = n; }
+
+
+Result::Result () : Matrix(), state("")
+        {
+        }
+
+Result::Result(std::string s, std::size_t r, std::size_t c)
+                : Matrix(r, c), state(s)
+        {
+	}
+
+Result::Result(const Result& R) 
+	:Matrix(R) , state(R.state) 
+{
+}
+
+Result& Result::operator=(const Result& R)
+{
+	Matrix::operator=(R);
+	state = R.state;
+
+	return *this;
+}
+
+
+void Result::set_state(std::string s) { state = s; }
+std::string Result::get_state() const { return state; }
+

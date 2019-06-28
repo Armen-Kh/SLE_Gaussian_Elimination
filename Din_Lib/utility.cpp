@@ -1,6 +1,6 @@
 #include "file_reader.hpp"
 #include "file_writer.hpp"
-#include "matrix.hpp"
+#include "sle_matrix.hpp"
 
 #include <iostream>
 #include <cstddef>
@@ -27,7 +27,7 @@ bool Read_Matrix_Data(File_Reader& fr, Matrix& M)
 	for(std::size_t i = 0; i < M.get_rows(); ++i) {
                 for(std::size_t j = 0; j < M.get_columns(); ++j) {
                         if(!(fr.float_reading(M(i, j)) && fr.char_reading(c))) {
-                                return false;
+				return false;
                         }
                 }
         }
@@ -42,32 +42,58 @@ bool Read_SLE(File_Reader& fr, Matrix& A, Matrix& B)
 	if(!(fr.char_reading(c) && fr.sizet_reading(number))) {
 		return false;
 	}
-	
-
-	if(Read_Matrix_Size(fr, A) && Read_Matrix_Data(fr, A) ){
-                for(int i =0; i < A.get_rows(); ++i) {
-                        for(int j =0; j < A.get_columns(); ++j){
-                                std::cout << A(i, j) << ", ";
-                        }
-                        std::cout << "\n";
-                }
+	if(c != '#') {				//This means, that instead of current SLE number there is a other symbol or data.. 
+		std::cout << "Possibly incomplete data or data type mismatch.\n"; 
 	}
-	else {	return false;}
+	
+	if(!(Read_Matrix_Size(fr, A) && Read_Matrix_Data(fr, A))) {
+		return false;
+	}
 
+	if(!(Read_Matrix_Size(fr, B) && Read_Matrix_Data(fr, B))) {
+                return false;
+	}
 
-	if(Read_Matrix_Size(fr, B) && Read_Matrix_Data(fr, B)) {
-                for(int i =0; i < B.get_rows(); ++i) {
-                        for(int j =0; j < B.get_columns(); ++j){
-                                std::cout << B(i, j) << ", ";
-                        }
-                        std::cout << "\n";
-                }
+	A.set_number(number);
+	B.set_number(number);
 
-               // B.set_size(B.get_columns());
-               assert(A.get_rows() == B.get_size() && "Size mismatch!");
+        assert(A.get_rows() == B.get_size() && "Size mismatch!");
                
+	return true;
+}
+
+
+bool Read_Result(File_Reader& fr, Result& R)
+{
+        std::string s;
+        char c;
+        std::size_t m, n;
+        float f;
+        if(!(fr.char_reading(c) && fr.sizet_reading(n))) {
+                return false;
         }
-        else { return false; }
+        R.set_number(n);
+
+        if(!fr.string_reading(s)) {
+                return false;
+        }
+	if("NS_The system has no solution!" == s) {
+		return true;
+	}
+
+        if(!(fr.char_reading(c) && fr.char_reading(c) && fr.sizet_reading(m) &&
+                       fr.char_reading(c) && fr.sizet_reading(n) && fr.char_reading(c))) {
+                return false;
+        }
+
+        R = Result(s, m, n);
+
+        for(std::size_t i = 0; i < R.get_size(); ++i) {
+                if(!(fr.float_reading(f) && fr.char_reading(c))) {
+                        return false;
+                }
+                R(i) = f;
+        }
 
 	return true;
 }
@@ -83,6 +109,13 @@ bool Write_SLE_Solution(File_Writer& fw,const Matrix& X, std::string& info)
 		return false;
 	}
 
+	if('N' == info[0]) {
+		if(!fw.string_writing("\n")) {
+			return false;
+		}
+		return true;
+	}
+
 	if(!(fw.string_writing("X(") && fw.float_writing(X.get_rows()) &&
 	   fw.char_writing('x') && fw.float_writing(X.get_columns()) &&
 	   fw.string_writing(")\n"))) {
@@ -95,7 +128,7 @@ bool Write_SLE_Solution(File_Writer& fw,const Matrix& X, std::string& info)
 		}
 	}
        
-	if(!fw.char_writing('\n')) {
+	if(!fw.string_writing("\n\n")) {
                 return false;
         }
 

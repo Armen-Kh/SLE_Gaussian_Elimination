@@ -1,0 +1,2 @@
+Deps/gaussian_elimination.dep Objectsgaussian_elimination.o: \
+ Sources/gaussian_elimination.cpp Headers/sle_matrix.hpp
